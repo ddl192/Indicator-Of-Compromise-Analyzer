@@ -2,37 +2,37 @@
 
 # How to use the analyzer?
 
-* Make sure you have Python 3 installed
+- Make sure you have Python 3 installed
 
-* Open terminal and navigate to the root folder of the project
+- Open terminal and navigate to the root folder of the project
 
-* To run the code, use this command:
+- To run the code, use this command:
 
 python src/analyzer.py
 
 # What is included in the project?
 
-* The main code, called "src/analyzer.py", is used to look for suspicious entries in files.
+- The main code, called "src/analyzer.py", is used to look for suspicious entries in files.
 
-* The file "src/ioc_list.json" contains a list of Indicators of Compromise (IOCs) that are used for scanning.
+- The file "src/ioc_list.json" contains a list of Indicators of Compromise (IOCs) that are used for scanning.
 
-* The sample log file for testing is called "src/apache.log".
+- The sample log file for testing is called "src/apache.log".
 
-* "src/alerts.csv" is where all alerts found are saved after analysis.
+- "src/alerts.csv" is where all alerts found are saved after analysis.
 
-* Tests run using the "tests/test_analyzer.py" file to make sure everything is working correctly.
+- Tests run using the "tests/test_analyzer.py" file to make sure everything is working correctly.
 
-* The manual is in the "docs/usage.md" folder (this manual).
+- The manual is in the "docs/usage.md" folder (this manual).
 
-* README.md contains general information about the project.
+- README.md contains general information about the project.
 
 # How to add your own indicators (IOCs)?
 
-* Open the file "src/ioc_list.json" in any text editor
+- Open the file "src/ioc_list.json" in any text editor
 
-* Put your IP addresses, domains, hashes, process names and file paths in the appropriate sections
+- Put your IP addresses, domains, hashes, process names and file paths in the appropriate sections
 
-* Save the file.
+- Save the file.
 
 Here is an example of what it should look like:
 
@@ -48,7 +48,8 @@ To test units, use bash -m tests/test_analyzer.py.
 
 # TIPS:
 
-* Check the routes when you move files to make sure they are not corrupted.
-* The analyzer prints notifications to terminal and saves them in the file "src/alerts.csv".
+- Check the routes when you move files to make sure they are not corrupted.
+- The analyzer prints notifications to terminal and saves them in the file "src/alerts.csv".
+
 
 ---
