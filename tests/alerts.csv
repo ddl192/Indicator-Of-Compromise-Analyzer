@@ -1,6 +1,0 @@
-file,ioc_type,pattern,line
-apache.log,ip,185.220.101.1,"185.220.101.1 - - [22/Jun/2025:14:15:01 +0000] ""GET /wp-admin.php HTTP/1.1"" 404 512"
-apache.log,filepath,/wp-admin.php http/1.1,"185.220.101.1 - - [22/Jun/2025:14:15:01 +0000] ""GET /wp-admin.php HTTP/1.1"" 404 512"
-apache.log,ip,45.227.253.3,"45.227.253.3 - - [22/Jun/2025:14:15:05 +0000] ""GET /index.html HTTP/1.1"" 200 1532"
-apache.log,ip,198.51.100.34,"198.51.100.34 - - [22/Jun/2025:14:15:12 +0000] ""POST /login HTTP/1.1"" 401 624"
-apache.log,ip,8.8.8.8,"8.8.8.8 - - [22/Jun/2025:14:15:25 +0000] ""GET /about.html HTTP/1.1"" 200 890"
