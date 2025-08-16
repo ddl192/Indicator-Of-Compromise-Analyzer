@@ -1,6 +1,4 @@
----
-
-*** IOC Log Analyzer ***
+# IOC Log Analyzer
 
 * A simple Python tool for scanning log files against a list of Indicators of Compromise (IOCs).
 Matches are printed to the console and saved into a CSV file for further analysis.
@@ -19,7 +17,7 @@ Matches are printed to the console and saved into a CSV file for further analysi
 
 * ioc_list.json — customizable IOC list (edit this file to add your own IOCs).
 
-*** A sample log file is not included. Provide your own log when running the script.
+* A sample log file is not included. Provide your own log when running the script.
 
 # Usage
 
@@ -60,5 +58,6 @@ python analyzer.py --apache apache.log
 ALERT! ip 8.8.8.8 8.8.8.8 - - [22/Jun/2025:14:15:25 +0000] "GET /about.html HTTP/1.1" 200 890
 Found 5 alerts
 Alerts saved to alerts.csv
+
 
 ---
