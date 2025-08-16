@@ -1,0 +1,37 @@
+{
+  "ips": [
+    "8.8.8.8", 
+    "1.2.3.4", 
+    "185.220.101.1", 
+    "45.227.253.3",
+    "198.51.100.34"
+  ],
+  "domains": [
+    "malicious.com", 
+    "bad-domain.org", 
+    "xn--example-evil.com",
+    "dropzone.evilhost.ru", 
+    "log4shellpayload.net" 
+  ],
+  "file_hashes": [
+    "44d88612fea8a8f36de82e1278abb02f", 
+    "e2fc714c4727ee9395f324cd2e7f331f", 
+    "6f5902ac237024bdd0c176cb93063dc4", 
+    "ecdd915d2fa4e4e255efbfea2e7fe551", 
+    "cfcd208495d565ef66e7dff9f98764da" 
+  ],
+  "process_names": [
+    "evilproc.exe", 
+    "svhost.exe", 
+    "coinminer.exe", 
+    "rundll32_mal.exe", 
+    "powershell_stealer.ps1" 
+  ],
+  "file_paths": [
+    "C:/Windows/System32/evil.dll", 
+    "/wp-admin.php HTTP/1.1", 
+    "/etc/shadow", 
+    "/tmp/malware.sh", 
+    "C:/Users/Public/AdobeUpdater.exe" 
+  ]
+}

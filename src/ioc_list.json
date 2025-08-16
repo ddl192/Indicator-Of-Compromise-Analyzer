@@ -1,0 +1,22 @@
+{
+  "ips": [
+    "", 
+    ""
+  ],
+  "domains": [
+    "", 
+    ""
+  ],
+  "file_hashes": [
+    "", 
+    ""
+  ],
+  "process_names": [
+    "", 
+    ""
+  ],
+  "file_paths": [
+    "", 
+    ""
+  ]
+}
