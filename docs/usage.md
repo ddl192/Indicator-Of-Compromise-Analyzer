@@ -10,7 +10,7 @@
 python src/analyzer.py
 ```
 
-**What is included in the project?**
+# What is included in the project?
 
 - The main code, called "src/analyzer.py", is used to look for suspicious entries in files.
 
@@ -26,7 +26,7 @@ python src/analyzer.py
 
 - README.md contains general information about the project.
 
-**How to add your own indicators (IOCs)?**
+# How to add your own indicators (IOCs)?
 
 - Open the file "src/ioc_list.json" in any text editor.
 
@@ -34,7 +34,7 @@ python src/analyzer.py
 
 - Save the file.
 
-**Here is an example of what it should look like:**
+# Here is an example of what it should look like: 
 
 - The JSON has the following parameters:
 
@@ -47,7 +47,7 @@ python src/analyzer.py
 }**
 
 
-**To make sure everything works, run:**
+# To make sure everything works, run:
 ```
 python tests/test_analyzer.py
 ```
@@ -56,9 +56,10 @@ python tests/test_analyzer.py
 ```
 python -m tests/test_analyzer.py
 ```
-**TIPS**
+# TIPS
 
 - Check the paths when you move files to make sure they are not corrupted.
 
 - The analyzer prints notifications to terminal and saves them in the file "src/alerts.csv".
+
 
