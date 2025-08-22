@@ -1,3 +1,6 @@
+
+![USAGE](https://github.com/user-attachments/assets/a723a6b0-d35d-43ed-bfca-7e661f4c3dfa)
+
 # How to use the analyzer?
 
 - Make sure you have Python 3 installed.
@@ -61,5 +64,6 @@ python -m tests/test_analyzer.py
 - Check the paths when you move files to make sure they are not corrupted.
 
 - The analyzer prints notifications to terminal and saves them in the file "src/alerts.csv".
+
 
 
