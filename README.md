@@ -1,3 +1,6 @@
+
+![IOC ANALYZER](https://github.com/user-attachments/assets/cd56bb98-cb54-49a9-b787-e34b568df5ea)
+
 # IOC Log Analyzer
 
 * A simple Python tool for scanning log files against a list of Indicators of Compromise (IOCs).
@@ -61,3 +64,4 @@ Alerts saved to alerts.csv
 
 
 ---
+
