@@ -5,25 +5,25 @@
 
 - Make sure you have Python 3 installed.
 
-- Open terminal and navigate to the root folder of the project.
+- Open terminal and navigate to the root folder of the project, then to the src directory.
 
 - To run the code, use this command:
 
 ```bash
-python src/analyzer.py
+python analyzer.py
 ```
 
-# What is included in the project?
+# What is included in this project?
 
-- The main code, called "src/analyzer.py", is used to look for suspicious entries in files.
+- The main code, called "analyzer.py", is used to look for suspicious entries in files.
 
-- The file "src/ioc_list.json" contains a list of Indicators of Compromise (IOCs) that are used for scanning.
+- The file "ioc_list.json" contains a list of Indicators of Compromise (IOCs) that are used for scanning.
 
-- The sample log file for testing is called "src/apache.log".
+- The sample log file for testing is called "apache.log".
 
-- "src/alerts.csv" is where all alerts found are saved after analysis.
+- "alerts.csv" is where all alerts found are saved after analysis.
 
-- Tests run using the "tests/test_analyzer.py" file to make sure everything is working correctly.
+- Tests can be run using the "test_analyzer.py" file located in the "tests" directory to ensure everything works correctly.
 
 - The manual is in the "docs/usage.md" folder (this manual).
 
@@ -31,11 +31,11 @@ python src/analyzer.py
 
 # How to add your own indicators (IOCs)?
 
-- Open the file "src/ioc_list.json" in any text editor.
+- Open the file "ioc_list.json" in any text editor.
 
 - Put your IP addresses, domains, hashes, process names and file paths in the appropriate sections.
 
-- Save the file.
+- Save your file.
 
 # Here is an example of what it should look like: 
 
@@ -52,18 +52,15 @@ python src/analyzer.py
 
 # To make sure everything works, run:
 ```
-python tests/test_analyzer.py
+python test_analyzer.py
 ```
 
-- or, to test units:
-```
-python -m tests/test_analyzer.py
-```
 # TIPS
 
 - Check the paths when you move files to make sure they are not corrupted.
 
-- The analyzer prints notifications to terminal and saves them in the file "src/alerts.csv".
+- The analyzer prints notifications to terminal and saves them in the file "alerts.csv".
+
 
 
 
