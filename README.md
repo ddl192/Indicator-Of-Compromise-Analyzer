@@ -28,7 +28,7 @@ Matches are printed to the console and saved into a CSV file for further analysi
 
 # Run:
 
-* python analyzer.py --apache apache.log
+* python analyzer.py
 
 
 * Results will be shown in the console and written to alerts.csv.
@@ -64,4 +64,5 @@ Alerts saved to alerts.csv
 
 
 ---
+
 
