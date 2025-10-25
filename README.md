@@ -27,9 +27,9 @@ Matches are printed to the console and saved into a CSV file for further analysi
 * Place ioc_list.json and your log file (e.g., apache.log) in the same directory as the script.
 
 # Run:
-
-* python analyzer.py
-
+```
+python analyzer.py
+```
 
 * Results will be shown in the console and written to alerts.csv.
 
@@ -64,5 +64,6 @@ Alerts saved to alerts.csv
 
 
 ---
+
 
 
