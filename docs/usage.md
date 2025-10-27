@@ -1,66 +1,170 @@
 
 ![USAGE](https://github.com/user-attachments/assets/a723a6b0-d35d-43ed-bfca-7e661f4c3dfa)
 
-# How to use the analyzer?
+# How to use the analyzer
 
-- Make sure you have Python 3 installed.
+* Make sure Python 3 is installed
 
-- Open terminal and navigate to the root folder of the project, then to the src directory.
+# Install dependencies:
 
-- To run the code, use this command:
+* pip install -r requirements.txt
 
-```bash
+
+# Configure VirusTotal (optional):
+```
+cp vt_config.example.json src/vt_config.json
+```
+### Edit src/vt_config.json and add your VirusTotal API key
+
+
+# Run the analyzer
+
+### Windows:
+```
+cd src
 python analyzer.py
+# or
+start_analyzer.cmd
 ```
 
-# What is included in this project?
-
-- The main code, called "analyzer.py", is used to look for suspicious entries in files.
-
-- The file "ioc_list.json" contains a list of Indicators of Compromise (IOCs) that are used for scanning.
-
-- The sample log file for testing is called "apache.log".
-
-- "alerts.csv" is where all alerts found are saved after analysis.
-
-- Tests can be run using the "test_analyzer.py" file located in the "tests" directory to ensure everything works correctly.
-
-- The manual is in the "docs/usage.md" folder (this manual).
-
-- README.md contains general information about the project.
-
-# How to add your own indicators (IOCs)?
-
-- Open the file "ioc_list.json" in any text editor.
-
-- Put your IP addresses, domains, hashes, process names and file paths in the appropriate sections.
-
-- Save your file.
-
-# Here is an example of what it should look like: 
-
-- The JSON has the following parameters:
-
-**{
-  "ips": ["1.2.3.4"],
-  "domains": ["malicious.com"],
-  "file_hashes": ["abc123"],
-  "process_names": ["badprocess.exe"],
-  "file_paths": ["C:/malware/path"]
-}**
-
-
-# To make sure everything works, run:
+### Linux/macOS:
 ```
+cd src
+python3 analyzer.py
+# or
+chmod +x start_analyzer.sh
+./start_analyzer.sh
+```
+
+### Pick from the menu:
+
+* Log analysis only
+
+* Log analysis plus VirusTotal check
+
+* VirusTotal IOC check only
+
+* Exit
+
+# Command Line Usage
+
+* Basic Log Analysis
+
+### Windows:
+```
+cd src
+python analyzer.py --log apache.log --ioc ioc_list.json --output results.csv
+```
+
+### Linux/macOS:
+```
+cd src
+python3 analyzer.py --log apache.log --ioc ioc_list.json --output results.csv
+```
+
+* Combined Analysis (Log plus VirusTotal)
+
+### Windows:
+```
+cd src
+python analyzer.py --log apache.log --ioc ioc_list.json --vt-check --output results.csv
+```
+
+### Linux/macOS:
+```
+cd src
+python3 analyzer.py --log apache.log --ioc ioc_list.json --vt-check --output results.csv
+```
+
+# Output files created:
+
+* results_combined.csv — unified results
+
+* results_virustotal.csv — VirusTotal results only
+
+* VirusTotal Only
+
+### Windows:
+```
+cd src
+python analyzer.py --ioc ioc_list.json --vt-only --output results.csv
+```
+
+### Linux/macOS:
+```
+cd src
+python3 analyzer.py --ioc ioc_list.json --vt-only --output results.csv
+```
+
+### Output file created:
+
+* results_virustotal.csv — VirusTotal results only
+
+# Project Contents
+
+* src/analyzer.py — main code for scanning logs
+
+* src/ioc_list.json — list of Indicators of Compromise
+
+* src/apache.log — sample log file
+
+### Output files:
+
+* alerts.csv — basic log analysis
+
+* results_combined.csv — log plus VirusTotal
+
+* results_virustotal.csv — VirusTotal only
+
+* Tests in tests/test_analyzer.py
+
+* Manual in docs/usage.md
+
+* General info in README.md
+
+# Adding Your Own IOCs
+
+### Open src/ioc_list.json in any editor
+
+* Add IPs, domains, hashes, process names, and file paths
+
+* Save the file
+
+### Example:
+```
+{
+  "ips": ["1.2.3.4", "192.168.1.100"],
+  "domains": ["malicious.com", "bad-site.org"],
+  "file_hashes": ["abc123def456", "44d88612fea8a8f36de82e1278abb02f"],
+  "process_names": ["badprocess.exe", "malware.exe"],
+  "file_paths": ["C:/malware/path", "/tmp/suspicious"]
+}
+```
+
+### Test your changes:
+```
+cd tests
 python test_analyzer.py
 ```
+# Command Line Options
 
-# TIPS
+### Basic log analysis
+```
+python analyzer.py --log apache.log --ioc ioc_list.json --output results.csv
+```
+### Log plus VirusTotal
+```
+python analyzer.py --log apache.log --ioc ioc_list.json --vt-check --output full_analysis.csv
+```
 
-- Check the paths when you move files to make sure they are not corrupted.
+### VirusTotal only
+```
+python analyzer.py --ioc ioc_list.json --vt-only
+```
+# Tips
 
-- The analyzer prints notifications to terminal and saves them in the file "alerts.csv".
+* The analyzer prints alerts to the terminal and saves them to CSV
 
+* Use interactive mode for easier operation
 
-
-
+* Add a VirusTotal API key to enable threat intelligence features
