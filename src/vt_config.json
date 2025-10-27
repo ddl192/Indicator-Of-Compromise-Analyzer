@@ -1,0 +1,10 @@
+{
+  "api_key": "YOUR_VIRUSTOTAL_API_KEY_HERE",
+  "rate_limit_delay": 1,
+  "enable_vt_checks": true,
+  "check_file_hashes": true,
+  "check_ip_addresses": true,
+  "check_domains": true,
+  "save_vt_results": true,
+  "vt_results_file": "virustotal_results.json"
+}
