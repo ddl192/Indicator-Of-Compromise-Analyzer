@@ -5,6 +5,7 @@
   "check_file_hashes": true,
   "check_ip_addresses": true,
   "check_domains": true,
+  "check_urls": true,
   "save_vt_results": true,
   "vt_results_file": "virustotal_results.json"
 }
