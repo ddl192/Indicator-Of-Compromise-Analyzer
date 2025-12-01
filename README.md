@@ -9,11 +9,11 @@
 
 # Features
 
-* Finds IOCs in logs: IPs, domains, file hashes, process names, and file paths
+* Finds IOCs in logs: IPs, domains, file hashes, and URLs
 
 * VirusTotal integration for live threat checks
 
-* Checks hashes, IPs, and domains on VirusTotal
+* Checks hashes, IPs, domains, and URLs on VirusTotal
 
 * Saves results to alerts.csv
 
@@ -123,6 +123,7 @@ python analyzer.py --ioc ioc_list.json --vt-config vt_config.json --vt-only
   "check_file_hashes": true,
   "check_ip_addresses": true,
   "check_domains": true,
+  "check_urls": true,
   "save_vt_results": true,
   "vt_results_file": "virustotal_results.json"
 }
