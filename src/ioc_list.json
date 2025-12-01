@@ -1,22 +1,15 @@
 {
   "ips": [
-    "", 
-    ""
+    "1.2.3.4"
   ],
   "domains": [
-    "", 
-    ""
+    "example.com"
   ],
   "file_hashes": [
-    "", 
-    ""
+    "44d88612fea8a8f36de82e1278abb02f"
   ],
-  "process_names": [
-    "", 
-    ""
-  ],
-  "file_paths": [
-    "", 
-    ""
+  "urls": [
+    "http://example.com/malicious"
   ]
 }
+
