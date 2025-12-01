@@ -1,3 +1,4 @@
+
 {
   "ips": [
     "8.8.8.8", 
@@ -20,18 +21,9 @@
     "ecdd915d2fa4e4e255efbfea2e7fe551", 
     "cfcd208495d565ef66e7dff9f98764da" 
   ],
-  "process_names": [
-    "evilproc.exe", 
-    "svhost.exe", 
-    "coinminer.exe", 
-    "rundll32_mal.exe", 
-    "powershell_stealer.ps1" 
-  ],
-  "file_paths": [
-    "C:/Windows/System32/evil.dll", 
-    "/wp-admin.php HTTP/1.1", 
-    "/etc/shadow", 
-    "/tmp/malware.sh", 
-    "C:/Users/Public/AdobeUpdater.exe" 
+  "urls": [
+    "http://malicious.com/payload",
+    "https://bad-domain.org/exploit",
+    "http://example.com/malicious"
   ]
 }
