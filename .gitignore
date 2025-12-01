@@ -14,4 +14,10 @@ venv/
 !src/apache.log
 
 *.csv
-!src/alerts.csv 
+!src/alerts.csv
+
+# Sensitive configuration files - DO NOT COMMIT
+src/vt_config.json
+src/virustotal_results.json
+*.key
+*.secret 
