@@ -126,7 +126,7 @@ python3 analyzer.py --ioc ioc_list.json --vt-only --output results.csv
 
 ### Open src/ioc_list.json in any editor
 
-* Add IPs, domains, hashes, process names, and file paths
+* Add IPs, domains, hashes, and URLs
 
 * Save the file
 
@@ -136,8 +136,7 @@ python3 analyzer.py --ioc ioc_list.json --vt-only --output results.csv
   "ips": ["1.2.3.4", "192.168.1.100"],
   "domains": ["malicious.com", "bad-site.org"],
   "file_hashes": ["abc123def456", "44d88612fea8a8f36de82e1278abb02f"],
-  "process_names": ["badprocess.exe", "malware.exe"],
-  "file_paths": ["C:/malware/path", "/tmp/suspicious"]
+  "urls": ["http://malicious.com/payload", "https://bad-site.org/exploit"]
 }
 ```
 
