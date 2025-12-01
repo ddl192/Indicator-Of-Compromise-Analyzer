@@ -9,21 +9,25 @@ def load_iocs(filename):
     try:
         with open(filename, 'r', encoding='utf-8') as f:
             data = json.load(f)
-        # Lowercase all IOCs for efficient searching
-        for key in ['ips', 'domains', 'file_hashes', 'process_names', 'file_paths']:
+        # Lowercase all IOCs for efficient searching (except URLs which should preserve case)
+        for key in ['ips', 'domains', 'file_hashes', 'urls']:
             if key in data:
-                data[key] = [v.lower() for v in data[key]]
+                if key == 'urls':
+                    # URLs should preserve case but we can still normalize
+                    data[key] = [v.strip() for v in data[key] if v.strip()]
+                else:
+                    data[key] = [v.lower() for v in data[key] if v.strip()]
             else:
                 data[key] = []
     except FileNotFoundError:
         print(f"IOC file '{filename}' not found.")
-        data = {k: [] for k in ['ips', 'domains', 'file_hashes', 'process_names', 'file_paths']}
+        data = {k: [] for k in ['ips', 'domains', 'file_hashes', 'urls']}
     except JSONDecodeError:
         print(f"IOC file '{filename}' is not valid JSON.")
-        data = {k: [] for k in ['ips', 'domains', 'file_hashes', 'process_names', 'file_paths']}
+        data = {k: [] for k in ['ips', 'domains', 'file_hashes', 'urls']}
     except Exception as e:
         print(f"Can't load IOC file: {e}")
-        data = {k: [] for k in ['ips', 'domains', 'file_hashes', 'process_names', 'file_paths']}
+        data = {k: [] for k in ['ips', 'domains', 'file_hashes', 'urls']}
     return data
 
 def search_iocs(text, iocs):
@@ -42,13 +46,10 @@ def search_iocs(text, iocs):
         if h in text_lower: 
             found.append(('hash', h))
     
-    for p in iocs.get('process_names', []):
-        if p in text_lower: 
-            found.append(('process', p))
-    
-    for path in iocs.get('file_paths', []):
-        if path in text_lower:
-            found.append(('filepath', path))
+    for url in iocs.get('urls', []):
+        # Check both original case and lowercase for URL matching
+        if url in text or url.lower() in text_lower:
+            found.append(('url', url))
     
     return found
 
@@ -93,9 +94,11 @@ def save_vt_results_to_csv(vt_results, filename):
             writer = csv.writer(f)
             writer.writerow(['ioc_type', 'ioc_value', 'malicious', 'suspicious', 'harmless', 'undetected', 'total_engines', 'detection_ratio', 'reputation'])
             for key, result in vt_results.items():
+                # Get IOC value based on type
+                ioc_value = result.get('hash') or result.get('address') or result.get('domain') or result.get('url') or 'unknown'
                 writer.writerow([
                     result.get('type', 'unknown'),
-                    result.get('hash', result.get('address', result.get('domain', 'unknown'))),
+                    ioc_value,
                     result.get('malicious', 0),
                     result.get('suspicious', 0),
                     result.get('harmless', 0),
@@ -127,10 +130,12 @@ def save_combined_results(alerts, vt_results, filename):
             
             # Add VirusTotal results
             for key, result in vt_results.items():
+                # Get IOC value based on type
+                ioc_value = result.get('hash') or result.get('address') or result.get('domain') or result.get('url') or 'unknown'
                 writer.writerow([
                     'virustotal_check',
                     result.get('type', 'unknown'),
-                    result.get('hash', result.get('address', result.get('domain', 'unknown'))),
+                    ioc_value,
                     result.get('malicious', 0),
                     result.get('suspicious', 0),
                     result.get('harmless', 0),
@@ -188,6 +193,11 @@ def check_iocs_with_virustotal(iocs, vt_config):
             for domain in iocs.get('domains', []):
                 if domain and domain.strip():
                     iocs_to_check.append(('domain', domain))
+        
+        if vt_config.get('check_urls', True):
+            for url in iocs.get('urls', []):
+                if url and url.strip():
+                    iocs_to_check.append(('url', url))
         
         if not iocs_to_check:
             print("No IOCs to check via VirusTotal.")
@@ -284,26 +294,39 @@ def run_analysis(ioc_file, log_file, output_file, vt_config_file, vt_check, vt_o
         if malicious_count > 0 or suspicious_count > 0:
             print("\n[WARNING] THREATS DETECTED:")
             for key, result in vt_results.items():
+                # Get IOC value based on type
+                ioc_value = result.get('hash') or result.get('address') or result.get('domain') or result.get('url') or 'unknown'
                 if result.get('malicious', 0) > 0:
-                    print(f"  [MALICIOUS] {result.get('type', 'unknown')}: {result.get('hash', result.get('address', result.get('domain', 'unknown')))} - {result['detection_ratio']} engines")
+                    print(f"  [MALICIOUS] {result.get('type', 'unknown')}: {ioc_value} - {result.get('detection_ratio', 'N/A')} engines")
                 elif result.get('suspicious', 0) > 0:
-                    print(f"  [SUSPICIOUS] {result.get('type', 'unknown')}: {result.get('hash', result.get('address', result.get('domain', 'unknown')))} - {result['detection_ratio']} engines")
+                    print(f"  [SUSPICIOUS] {result.get('type', 'unknown')}: {ioc_value} - {result.get('detection_ratio', 'N/A')} engines")
     
     # Save results based on analysis type
-    if vt_check and not vt_only and alerts:
-        # Combined analysis: save both log analysis and VirusTotal results in one file
-        combined_filename = output_file.replace('.csv', '_combined.csv')
-        save_combined_results(alerts, vt_results, combined_filename)
-        print(f"Combined results saved to {combined_filename}")
+    if vt_check and not vt_only:
+        # Combined analysis: save both log analysis and VirusTotal results
+        if alerts and vt_results:
+            # Both log analysis and VirusTotal results available
+            base_name = os.path.splitext(output_file)[0]
+            combined_filename = f"{base_name}_combined.csv"
+            save_combined_results(alerts, vt_results, combined_filename)
+            print(f"Combined results saved to {combined_filename}")
         
-        # Also save VirusTotal results separately
-        vt_csv_filename = output_file.replace('.csv', '_virustotal.csv')
-        save_vt_results_to_csv(vt_results, vt_csv_filename)
-        print(f"VirusTotal results saved to {vt_csv_filename}")
+        # Always save VirusTotal results separately if available
+        if vt_results:
+            base_name = os.path.splitext(output_file)[0]
+            vt_csv_filename = f"{base_name}_virustotal.csv"
+            save_vt_results_to_csv(vt_results, vt_csv_filename)
+            print(f"VirusTotal results saved to {vt_csv_filename}")
+        
+        # Save log analysis results if available
+        if alerts:
+            save_alerts(alerts, output_file)
+            print(f"Alerts saved to {output_file}")
         
     elif vt_only and vt_results:
         # VirusTotal only: save VirusTotal results
-        vt_csv_filename = output_file.replace('.csv', '_virustotal.csv')
+        base_name = os.path.splitext(output_file)[0]
+        vt_csv_filename = f"{base_name}_virustotal.csv"
         save_vt_results_to_csv(vt_results, vt_csv_filename)
         print(f"VirusTotal results saved to {vt_csv_filename}")
         
