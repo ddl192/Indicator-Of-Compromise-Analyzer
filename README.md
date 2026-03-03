@@ -1,5 +1,6 @@
 
-![IOC ANALYZER](https://github.com/user-attachments/assets/cd56bb98-cb54-49a9-b787-e34b568df5ea)
+<img width="1920" height="1040" alt="ioc analyzer" src="https://github.com/user-attachments/assets/4c7bff45-bbb9-4fea-a054-297d901fb389" />
+
 
 # IOC Log Analyzer with VirusTotal Integration
 
@@ -178,3 +179,4 @@ Output Files
 * VirusTotal results are saved in JSON
 
 * If files are missing, the script shows an error
+
