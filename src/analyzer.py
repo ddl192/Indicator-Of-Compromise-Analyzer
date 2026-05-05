@@ -1,5 +1,5 @@
 """
-IOC Log Analyzer with VirusTotal Integration — hardened edition.
+IOC Log Analyzer with VirusTotal Integration - hardened edition.
 
 Backwards-compatible with the original repo:
   * Same CLI:  --ioc, --log, --output, --vt-config, --vt-check, --vt-only
@@ -10,7 +10,6 @@ Backwards-compatible with the original repo:
 
 What's new (transparent to existing callers):
   • Robust loaders: bad JSON / wrong types / non-string entries no longer crash.
-  • Word-boundary domain matching — no more "myexample.com" matching "example.com".
   • Per-line de-duplication of identical IOC matches.
   • Optional regex auto-extraction of IOCs from log lines (--auto-extract).
   • Persistent VT cache (configured in vt_config.json) survives between runs.
@@ -149,7 +148,7 @@ def load_iocs(filename: str) -> Dict[str, List[str]]:
     Load an IOC list JSON. Returns a dict with the canonical four keys, each
     mapped to a list of strings.
 
-    The function never raises — it returns empty lists on any failure and
+    The function never raises - it returns empty lists on any failure and
     prints a diagnostic message.
     """
     try:
@@ -257,7 +256,7 @@ def _ip_in_text(ip: str, text: str) -> bool:
     """
     Boundary-sensitive substring check for IPs.
 
-    Without boundaries, `1.2.3.4` matches inside `11.2.3.45` — a classic
+    Without boundaries, `1.2.3.4` matches inside `11.2.3.45` - a classic
     false positive that floods the alerts.
 
     Boundary rules (asymmetric):
@@ -472,8 +471,8 @@ def _ioc_value_from_result(result: Dict[str, Any]) -> str:
     """
     Pick the most user-friendly identifier from a VT result row.
 
-    For files we prefer `queried_hash` — the exact value the user put in
-    their IOC list — so a summary line about an MD5 lookup doesn't suddenly
+    For files we prefer `queried_hash` - the exact value the user put in
+    their IOC list - so a summary line about an MD5 lookup doesn't suddenly
     print VT's canonical SHA-256 (which is the same file but a different
     fingerprint and confuses readers).
     """
@@ -597,7 +596,7 @@ def save_combined_results(
 
 # ── VT config loading ───────────────────────────────────────────────────────
 
-# Default config — used when fields are missing or the file is absent.
+# Default config - used when fields are missing or the file is absent.
 _VT_DEFAULTS: Dict[str, Any] = {
     "api_key": "",
     "rate_limit_delay": 1,
