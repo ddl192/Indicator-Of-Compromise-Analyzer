@@ -7,5 +7,13 @@
   "check_domains": true,
   "check_urls": true,
   "save_vt_results": true,
-  "vt_results_file": "virustotal_results.json"
+  "vt_results_file": "virustotal_results.json",
+
+  "cache_enabled": true,
+  "cache_path": ".vt_cache.json",
+  "cache_ttl_hours": 24,
+  "negative_cache_ttl_hours": 4,
+
+  "max_retries": 4,
+  "request_timeout": 30
 }
