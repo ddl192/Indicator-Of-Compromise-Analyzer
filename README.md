@@ -6,18 +6,15 @@ A Python tool that scans log files for Indicators of Compromise (IOCs) and
 optionally enriches them with the VirusTotal API. Matches print to the console
 and are saved as CSV (and JSON for VirusTotal results).
 
-> Hardened edition. The CLI, file layout, and JSON/CSV schemas are kept
-> compatible with the original repo — drop-in replacement.
-
 ## Features
 
 - Finds IOCs in logs: IPs, domains, file hashes (MD5/SHA1/SHA256), and URLs.
 - VirusTotal enrichment for hashes, IPs, domains, and URLs.
-- **Persistent VirusTotal cache** (positive + negative TTL) — survives between
+- **Persistent VirusTotal cache** (positive + negative TTL) - survives between
   runs, dramatically faster on the 4 req/min free tier.
 - **Bounded retries with exponential backoff** on 429 / 5xx / network errors;
   honors `Retry-After`.
-- **Word-boundary domain matching** — no more false positives from substring
+- **Word-boundary domain matching** - no more false positives from substring
   hits (e.g. `notexample.com` no longer matches `example.com`).
 - **Optional regex auto-extraction** of IOCs from log lines (`--auto-extract`).
 - Atomic CSV/JSON writes; output directory auto-created.
@@ -31,7 +28,7 @@ and are saved as CSV (and JSON for VirusTotal results).
 │   ├── analyzer.py             # main script + interactive menu + CLI
 │   ├── virustotal_api.py       # VirusTotal v3 client (cached, retrying)
 │   ├── ioc_list.json           # your IOC list (edit this)
-│   ├── vt_config.json          # local config (gitignored — copy from example)
+│   ├── vt_config.json          # local config (gitignored - copy from example)
 │   ├── start_analyzer.cmd      # Windows launcher
 │   └── start_analyzer.sh       # Linux/macOS launcher
 ├── tests/
@@ -121,17 +118,17 @@ python analyzer.py --log apache.log --ioc ioc_list.json --auto-extract
 | `--ioc` | `ioc_list.json` | IOC list file |
 | `--output` | `alerts.csv` | Base output path |
 | `--vt-config` | `vt_config.json` | VirusTotal config file |
-| `--vt-check` | – | Enable VirusTotal enrichment |
-| `--vt-only` | – | Skip log analysis; only check the IOC list with VT |
-| `--auto-extract` | – | Also extract IOCs from log lines via regex |
-| `-q`, `--quiet` | – | Suppress per-line alert prints |
+| `--vt-check` | - | Enable VirusTotal enrichment |
+| `--vt-only` | / | Skip log analysis; only check the IOC list with VT |
+| `--auto-extract` | - | Also extract IOCs from log lines via regex |
+| `-q`, `--quiet` | - | Suppress per-line alert prints |
 
 Exit codes: `0` ok, `2` nothing found / nothing checked, `130` interrupted
 (Ctrl+C), `1` fatal error.
 
 ## VirusTotal Configuration
 
-`src/vt_config.json` — full schema:
+`src/vt_config.json` - full schema:
 
 ```json
 {
@@ -155,16 +152,16 @@ Exit codes: `0` ok, `2` nothing found / nothing checked, `130` interrupted
 }
 ```
 
-The cache + retry fields are **optional** — defaults are sensible if you omit
+The cache + retry fields are **optional** - defaults are sensible if you omit
 them.
 
 ## Output Files
 
-- `alerts.csv` — IOC matches in logs (columns: `file, ioc_type, pattern, line`).
-- `alerts_combined.csv` — log + VirusTotal results unified.
-- `alerts_virustotal.csv` — VirusTotal results only.
-- `virustotal_results.json` — raw VirusTotal results dict.
-- `.vt_cache.json` — persistent cache (gitignored).
+- `alerts.csv` - IOC matches in logs (columns: `file, ioc_type, pattern, line`).
+- `alerts_combined.csv` - log + VirusTotal results unified.
+- `alerts_virustotal.csv` - VirusTotal results only.
+- `virustotal_results.json` - raw VirusTotal results dict.
+- `.vt_cache.json` - persistent cache (gitignored).
 
 ## Sample Output
 
@@ -208,7 +205,7 @@ python -m unittest discover -s tests -v
 
 - IPs are matched as exact substrings; domains use word-boundary matching;
   hashes and URLs are matched case-insensitively.
-- VirusTotal free tier is 4 requests/minute — the persistent cache means
+- VirusTotal free tier is 4 requests/minute - the persistent cache means
   repeat runs only re-query IOCs that have expired or were missing.
 - Sensitive files (`vt_config.json`, `virustotal_results.json`,
   `.vt_cache.json`) are gitignored by default.
