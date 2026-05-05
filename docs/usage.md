@@ -17,7 +17,7 @@ pip install -r requirements.txt
 cp vt_config.example.json src/vt_config.json
 ```
 
-Edit `src/vt_config.json` and add your VirusTotal API key — **or** export it
+Edit `src/vt_config.json` and add your VirusTotal API key - **or** export it
 as an environment variable (the env var wins over the file):
 
 ```bash
@@ -100,7 +100,7 @@ Open `src/ioc_list.json`:
 
 Notes:
 
-- Domains are matched on label boundaries — `notexample.com` does NOT match
+- Domains are matched on label boundaries - `notexample.com` does NOT match
   `example.com`.
 - Hashes are case-insensitive (input is lowercased on load).
 - URLs preserve their original case in output but are matched
