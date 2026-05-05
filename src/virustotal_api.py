@@ -323,7 +323,7 @@ class VirusTotalAPI:
         result = self._make_request(f"files/{h}")
         parsed: Optional[dict] = None
         if result and isinstance(result.get("data"), dict):
-            parsed = self._parse_file_result(result["data"])
+            parsed = self._parse_file_result(result["data"], queried=h)
         self._store("hash", h, parsed)
         return parsed
 
@@ -421,12 +421,32 @@ class VirusTotalAPI:
         t = int(stats.get("timeout") or 0)
         return m, s, h, u, t, m + s + h + u + t
 
-    def _parse_file_result(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def _parse_file_result(
+        self, data: Dict[str, Any], queried: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Parse a /files/{id} response.
+
+        VT v3 always canonicalizes file IDs to SHA-256 in responses, even
+        when the request was made with an MD5 or SHA-1 hash. To avoid the
+        confusing "I queried 44d8... but VT returned 275a..." in summaries,
+        we record:
+          - `queried_hash`: exactly what the user asked for (their MD5/SHA1/SHA256)
+          - `hash`: the canonical SHA-256 returned by VT
+          - `md5`, `sha1`, `sha256`: all three forms when VT exposes them
+        Backwards compat: `hash` keeps the SHA-256 (= `data.id`) the original
+        code returned, so existing CSV consumers still work.
+        """
         attrs = data.get("attributes", {}) or {}
         m, s, h, u, _, total = self._stats_totals(attrs.get("last_analysis_stats", {}))
+        sha256 = data.get("id")
         return {
             "type": "file",
-            "hash": data.get("id"),
+            "hash": sha256,                                       # canonical (SHA-256)
+            "queried_hash": queried or sha256,                    # what the user asked for
+            "md5": attrs.get("md5"),
+            "sha1": attrs.get("sha1"),
+            "sha256": attrs.get("sha256") or sha256,
             "malicious": m,
             "suspicious": s,
             "undetected": u,
