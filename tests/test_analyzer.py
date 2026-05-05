@@ -204,7 +204,7 @@ class TestSearchIocs(unittest.TestCase):
     def test_ip_boundary_does_not_match_inside_longer_ip(self):
         """`1.2.3.4` must NOT match inside `11.2.3.45`. Reported by user."""
         iocs = {"ips": ["1.2.3.4"], "domains": [], "file_hashes": [], "urls": []}
-        # Apache log line — IOC 1.2.3.4 should NOT match the source IP 11.2.3.45.
+        # Apache log line - IOC 1.2.3.4 should NOT match the source IP 11.2.3.45.
         line = '11.2.3.45 - - [01/May/2026:10:41:22 +0000] "GET /metrics HTTP/1.1" 304 256'
         self.assertEqual(search_iocs(line, iocs), [])
         # And `1.2.3.4` must also not match `1.2.3.45` or `1.2.3.40`.
