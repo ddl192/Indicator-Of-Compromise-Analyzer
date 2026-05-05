@@ -469,8 +469,17 @@ def save_alerts(alerts: List[Dict[str, str]], outfile: str) -> None:
 
 
 def _ioc_value_from_result(result: Dict[str, Any]) -> str:
+    """
+    Pick the most user-friendly identifier from a VT result row.
+
+    For files we prefer `queried_hash` — the exact value the user put in
+    their IOC list — so a summary line about an MD5 lookup doesn't suddenly
+    print VT's canonical SHA-256 (which is the same file but a different
+    fingerprint and confuses readers).
+    """
     return (
-        result.get("hash")
+        result.get("queried_hash")
+        or result.get("hash")
         or result.get("address")
         or result.get("domain")
         or result.get("url")
@@ -479,7 +488,12 @@ def _ioc_value_from_result(result: Dict[str, Any]) -> str:
 
 
 def save_vt_results_to_csv(vt_results: Dict[str, Dict[str, Any]], filename: str) -> None:
-    """Write the original VT-only CSV schema."""
+    """
+    Write the original VT-only CSV schema, plus a trailing `extra` column
+    that carries the canonical SHA-256 for files when it differs from the
+    queried hash. The original 9 columns are unchanged so legacy consumers
+    still parse fine.
+    """
     import io
 
     buf = io.StringIO()
@@ -495,9 +509,16 @@ def save_vt_results_to_csv(vt_results: Dict[str, Dict[str, Any]], filename: str)
             "total_engines",
             "detection_ratio",
             "reputation",
+            "extra",
         ]
     )
     for _key, result in vt_results.items():
+        extra = ""
+        if result.get("type") == "file":
+            queried = result.get("queried_hash")
+            sha256 = result.get("sha256") or result.get("hash")
+            if queried and sha256 and queried != sha256:
+                extra = f"sha256={sha256}"
         writer.writerow(
             [
                 result.get("type", "unknown"),
@@ -509,6 +530,7 @@ def save_vt_results_to_csv(vt_results: Dict[str, Dict[str, Any]], filename: str)
                 result.get("total_engines", 0),
                 result.get("detection_ratio", "0/0"),
                 result.get("reputation", 0),
+                extra,
             ]
         )
     if _atomic_write(filename, buf.getvalue()):
@@ -851,15 +873,24 @@ def run_analysis(
             print(f"\n{_c('31', '[WARNING] THREATS DETECTED:')}")
             for _, result in vt_results.items():
                 ioc_value = _ioc_value_from_result(result)
+                # When VT returned a different (canonical SHA-256) hash than
+                # what the user queried, surface both so the report stays
+                # traceable to the user's IOC list.
+                extra = ""
+                if result.get("type") == "file":
+                    queried = result.get("queried_hash")
+                    sha256 = result.get("sha256") or result.get("hash")
+                    if queried and sha256 and queried != sha256:
+                        extra = f"  (sha256: {sha256})"
                 if result.get("malicious", 0) > 0:
                     print(
                         f"  {_c('31', '[MALICIOUS]')} {result.get('type', 'unknown')}: "
-                        f"{ioc_value} — {result.get('detection_ratio', 'N/A')} engines"
+                        f"{ioc_value} — {result.get('detection_ratio', 'N/A')} engines{extra}"
                     )
                 elif result.get("suspicious", 0) > 0:
                     print(
                         f"  {_c('33', '[SUSPICIOUS]')} {result.get('type', 'unknown')}: "
-                        f"{ioc_value} — {result.get('detection_ratio', 'N/A')} engines"
+                        f"{ioc_value} — {result.get('detection_ratio', 'N/A')} engines{extra}"
                     )
 
     # Save outputs (same paths as original)
