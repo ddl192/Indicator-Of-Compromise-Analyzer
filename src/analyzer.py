@@ -39,6 +39,17 @@ from virustotal_api import VirusTotalAPI, load_vt_config
 
 # ── Console formatting (ANSI, optional) ─────────────────────────────────────
 
+# On Windows, stdout/stderr default to a legacy code page (cp1252 on en-US,
+# cp866 on ru-RU, etc.) that can't encode many printable Unicode characters
+# we use, like the arrow "→" in normalization messages. This causes
+# UnicodeEncodeError crashes on plain `print(...)`. Switch the streams to
+# UTF-8 with replacement fallback so we never crash on user-visible output.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")  # py3.7+
+    except (AttributeError, OSError):
+        pass
+
 _USE_COLOR = (
     sys.stdout.isatty()
     and os.environ.get("NO_COLOR") is None
@@ -52,20 +63,33 @@ def _c(code: str, text: str) -> str:
     return f"\033[{code}m{text}\033[0m"
 
 
+def _safe_print(text: str) -> None:
+    """Print, but never crash on encoding errors (Windows legacy code pages)."""
+    try:
+        print(text)
+    except UnicodeEncodeError:
+        enc = getattr(sys.stdout, "encoding", "ascii") or "ascii"
+        try:
+            sys.stdout.buffer.write(text.encode(enc, errors="replace") + b"\n")
+            sys.stdout.flush()
+        except Exception:
+            print(text.encode("ascii", errors="replace").decode("ascii"))
+
+
 def _info(msg: str) -> None:
-    print(_c("36", "[INFO]") + f" {msg}")
+    _safe_print(_c("36", "[INFO]") + f" {msg}")
 
 
 def _ok(msg: str) -> None:
-    print(_c("32", "[OK]") + f" {msg}")
+    _safe_print(_c("32", "[OK]") + f" {msg}")
 
 
 def _warn(msg: str) -> None:
-    print(_c("33", "[WARN]") + f" {msg}")
+    _safe_print(_c("33", "[WARN]") + f" {msg}")
 
 
 def _err(msg: str) -> None:
-    print(_c("31", "[ERR]") + f" {msg}")
+    _safe_print(_c("31", "[ERR]") + f" {msg}")
 
 
 def _hr(title: str = "") -> None:
