@@ -1,5 +1,4 @@
 """
-VirusTotal API v3 client — hardened, drop-in compatible.
 
 Public API kept identical to the original:
     VirusTotalAPI(api_key)
@@ -18,11 +17,11 @@ Improvements (no breaking changes):
   • Persistent JSON cache on disk (positive + negative TTL) to survive 4 req/min.
   • URL identifier uses URL-safe base64 (canonical VT v3 form), with sha256 fallback.
   • URL submission with proper polling (status == "completed") instead of single sleep.
-  • Negative caching for 404s — no re-querying IOCs already known to be unknown.
+  • Negative caching for 404s - no re-querying IOCs already known to be unknown.
   • Per-instance request session for connection pooling.
   • All dict results keep the original schema (type, hash/address/domain/url, malicious,
     suspicious, harmless, undetected, total_engines, detection_ratio, reputation).
-  • Class is also a context manager — `with VirusTotalAPI(...) as vt:` flushes the cache.
+  • Class is also a context manager - `with VirusTotalAPI(...) as vt:` flushes the cache.
 """
 
 from __future__ import annotations
@@ -52,7 +51,7 @@ class _VTCache:
     Stored value:
         {"data": <result-dict-or-None>, "ts": <epoch-seconds>}
 
-    `data is None` means a *negative* cache hit — IOC is known to be absent
+    `data is None` means a *negative* cache hit - IOC is known to be absent
     from VirusTotal (404). It uses a shorter TTL by default so we re-check
     eventually.
     """
@@ -120,7 +119,7 @@ class _VTCache:
 
 
 class VirusTotalAPI:
-    """VirusTotal API v3 client — backwards-compatible with the original."""
+    """VirusTotal API v3 client - backwards-compatible with the original."""
 
     BASE_URL = "https://www.virustotal.com/api/v3"
 
