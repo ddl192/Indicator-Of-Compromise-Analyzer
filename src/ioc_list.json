@@ -1,15 +1,16 @@
 {
   "ips": [
-    "1.2.3.4"
+    "1.2.3.4",
+    "  185.220.101.50  ",
+    "203.0.113[.]45"
   ],
   "domains": [
-    "example.com"
+    "[example.com](http://example.com)"
   ],
   "file_hashes": [
     "44d88612fea8a8f36de82e1278abb02f"
   ],
   "urls": [
-    "http://example.com/malicious"
+    "<http://example.com/malicious>"
   ]
 }
-
