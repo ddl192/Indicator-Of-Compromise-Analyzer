@@ -40,14 +40,33 @@ jobs:
         run: python -m unittest discover -s tests -v
 
       - name: Smoke-test CLI (log analysis only — no network)
-        shell: bash
-        env:
-          TMP_OUT: ${{ runner.temp }}/alerts.csv
+        shell: python
         run: |
-          cd src
-          cp ../tests/apache.log .
-          cp ../tests/ioc_list.json ./ioc_list.json
-          python analyzer.py --log apache.log --ioc ioc_list.json --output "$TMP_OUT" -q
-          test -f "$TMP_OUT"
-          # The first line must be the original CSV header (compat check).
-          head -n1 "$TMP_OUT" | grep -q '^file,ioc_type,pattern,line'
+          import os, shutil, subprocess, sys, tempfile
+
+          os.chdir("src")
+          shutil.copy("../tests/apache.log", "apache.log")
+          shutil.copy("../tests/ioc_list.json", "ioc_list.json")
+
+          out = os.path.join(tempfile.gettempdir(), "alerts.csv")
+
+          rc = subprocess.run(
+              [sys.executable, "analyzer.py",
+               "--log", "apache.log",
+               "--ioc", "ioc_list.json",
+               "--output", out, "-q"],
+              check=False,
+          ).returncode
+          # 0 = found alerts, 2 = nothing found. Both fine for smoke-test.
+          if rc not in (0, 2):
+              sys.exit(f"analyzer exited with code {rc}")
+
+          if not os.path.isfile(out):
+              sys.exit(f"output file not created: {out}")
+
+          with open(out, "r", encoding="utf-8", newline="") as f:
+              first = f.readline().strip()
+          expected = "file,ioc_type,pattern,line"
+          if first != expected:
+              sys.exit(f"unexpected CSV header: {first!r} (want {expected!r})")
+          print(f"OK: smoke-test passed (header={first!r})")
