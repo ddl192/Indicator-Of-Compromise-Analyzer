@@ -28,6 +28,7 @@ from analyzer import (  # noqa: E402  (intentional after sys.path tweak)
     save_alerts,
     _domain_in_text,
     _extract_iocs_from_text,
+    _ioc_value_from_result,
     load_vt_config_file,
 )
 
@@ -378,6 +379,36 @@ class TestLoadVTConfigFile(unittest.TestCase):
             with open(cfg_path, "w", encoding="utf-8") as f:
                 f.write("{not valid")
             self.assertIsNone(load_vt_config_file(cfg_path))
+
+
+class TestIocValueFromResult(unittest.TestCase):
+    def test_file_prefers_queried_hash(self):
+        """Summary lines must show the user's MD5, not VT's canonical SHA-256."""
+        result = {
+            "type": "file",
+            "hash": "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f",
+            "queried_hash": "44d88612fea8a8f36de82e1278abb02f",
+            "sha256": "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f",
+            "md5": "44d88612fea8a8f36de82e1278abb02f",
+        }
+        self.assertEqual(_ioc_value_from_result(result),
+                         "44d88612fea8a8f36de82e1278abb02f")
+
+    def test_file_falls_back_to_hash_when_no_queried(self):
+        result = {"type": "file", "hash": "abc"}
+        self.assertEqual(_ioc_value_from_result(result), "abc")
+
+    def test_ip(self):
+        self.assertEqual(_ioc_value_from_result({"address": "1.2.3.4"}), "1.2.3.4")
+
+    def test_domain(self):
+        self.assertEqual(_ioc_value_from_result({"domain": "evil.com"}), "evil.com")
+
+    def test_url(self):
+        self.assertEqual(_ioc_value_from_result({"url": "http://x"}), "http://x")
+
+    def test_unknown_default(self):
+        self.assertEqual(_ioc_value_from_result({}), "unknown")
 
 
 if __name__ == "__main__":
