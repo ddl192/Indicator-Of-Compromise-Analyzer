@@ -1,122 +1,139 @@
-
 <img width="1920" height="1040" alt="ioc analyzer" src="https://github.com/user-attachments/assets/4c7bff45-bbb9-4fea-a054-297d901fb389" />
-
 
 # IOC Log Analyzer with VirusTotal Integration
 
-### A Python tool that scans log files for Indicators of Compromise (IOCs).
-* It can also check IOCs with the VirusTotal API.
-* Matches appear in the console and are saved to a CSV file.
+A Python tool that scans log files for Indicators of Compromise (IOCs) and
+optionally enriches them with the VirusTotal API. Matches print to the console
+and are saved as CSV (and JSON for VirusTotal results).
 
-# Features
+> Hardened edition. The CLI, file layout, and JSON/CSV schemas are kept
+> compatible with the original repo — drop-in replacement.
 
-* Finds IOCs in logs: IPs, domains, file hashes, and URLs
+## Features
 
-* VirusTotal integration for live threat checks
+- Finds IOCs in logs: IPs, domains, file hashes (MD5/SHA1/SHA256), and URLs.
+- VirusTotal enrichment for hashes, IPs, domains, and URLs.
+- **Persistent VirusTotal cache** (positive + negative TTL) — survives between
+  runs, dramatically faster on the 4 req/min free tier.
+- **Bounded retries with exponential backoff** on 429 / 5xx / network errors;
+  honors `Retry-After`.
+- **Word-boundary domain matching** — no more false positives from substring
+  hits (e.g. `notexample.com` no longer matches `example.com`).
+- **Optional regex auto-extraction** of IOCs from log lines (`--auto-extract`).
+- Atomic CSV/JSON writes; output directory auto-created.
+- Graceful Ctrl+C, sane exit codes, ANSI colors when running in a TTY.
 
-* Checks hashes, IPs, domains, and URLs on VirusTotal
+## Project Structure
 
-* Saves results to alerts.csv
+```
+.
+├── src/
+│   ├── analyzer.py             # main script + interactive menu + CLI
+│   ├── virustotal_api.py       # VirusTotal v3 client (cached, retrying)
+│   ├── ioc_list.json           # your IOC list (edit this)
+│   ├── vt_config.json          # local config (gitignored — copy from example)
+│   ├── start_analyzer.cmd      # Windows launcher
+│   └── start_analyzer.sh       # Linux/macOS launcher
+├── tests/
+│   ├── test_analyzer.py
+│   ├── apache.log              # sample log
+│   └── ioc_list.json           # sample IOCs
+├── docs/
+│   └── usage.md
+├── vt_config.example.json      # template (no secret)
+├── requirements.txt
+├── LICENSE
+└── README.md
+```
 
-# Configurable checks and detailed VirusTotal info
+## Installation
 
-* Easy to extend with your own IOC lists
+```bash
+pip install -r requirements.txt
+```
 
-# Project Structure
-
-* analyzer.py - main script with VirusTotal integration
-
-* virustotal_api.py - VirusTotal API client
-  
-* vt_config.example.json - config template (copy and edit with your API key)
-
-* ioc_list.json - list of IOCs (you can edit it)
-
-* requirements.txt - Python dependencies
-
-### Note: bring your own log file when running the script.
-
-# Installation
-
-### Install dependencies
-
-* pip install -r requirements.txt
-
-
-### Get a VirusTotal API key
-* Register at virustotal.com
-* and copy your key
+Only requirement: `requests`.
 
 ### Configure VirusTotal
 
-* cp vt_config.example.json src/vt_config.json
-
-
-* Edit src/vt_config.json and add your API key
-* Or set it as an environment variable VT_API_KEY
-
-# Usage
-### Interactive Mode (recommended)
+```bash
+cp vt_config.example.json src/vt_config.json
 ```
+
+Edit `src/vt_config.json` and set `api_key`, **or** set the `VT_API_KEY`
+environment variable (env wins over the file).
+
+## Usage
+
+### Interactive mode (recommended)
+
+```bash
 cd src
 python analyzer.py
 ```
 
-### Select from the menu:
+Pick from the menu:
+
 ```
-Log analysis only
-
-Log analysis + VirusTotal check
-
-VirusTotal check only
-
-Exit
+1. Log analysis only (fast)
+2. Log analysis + VirusTotal check
+3. VirusTotal IOC check only
+4. Exit
 ```
-# Windows
 
-### Run start_analyzer.cmd in the src folder.
+### Windows launcher
 
-# Linux or macOS
+```bat
+cd src
+start_analyzer.cmd
 ```
+
+### Linux / macOS launcher
+
+```bash
 cd src
 chmod +x start_analyzer.sh
 ./start_analyzer.sh
 ```
 
-# Manual Commands
-### Log analysis only
-```
-cd src
+### CLI mode
+
+```bash
+# Log analysis only
 python analyzer.py --log apache.log --ioc ioc_list.json
-```
-### With VirusTotal
-```
-cd src
-python analyzer.py --log apache.log --ioc ioc_list.json --vt-config vt_config.json --vt-check
-```
-### VirusTotal only
-```
-cd src
+
+# With VirusTotal
+python analyzer.py --log apache.log --ioc ioc_list.json \
+    --vt-config vt_config.json --vt-check
+
+# VirusTotal only
 python analyzer.py --ioc ioc_list.json --vt-config vt_config.json --vt-only
+
+# With regex auto-extraction (also catches IOCs not in your list)
+python analyzer.py --log apache.log --ioc ioc_list.json --auto-extract
 ```
-### Command Line Options
 
-* --log log file (default: apache.log)
+### Command-line options
 
-* --ioc IOC list (default: ioc_list.json)
+| Flag | Default | Description |
+|---|---|---|
+| `--log` | `apache.log` | Log file to analyze |
+| `--ioc` | `ioc_list.json` | IOC list file |
+| `--output` | `alerts.csv` | Base output path |
+| `--vt-config` | `vt_config.json` | VirusTotal config file |
+| `--vt-check` | – | Enable VirusTotal enrichment |
+| `--vt-only` | – | Skip log analysis; only check the IOC list with VT |
+| `--auto-extract` | – | Also extract IOCs from log lines via regex |
+| `-q`, `--quiet` | – | Suppress per-line alert prints |
 
-* --output CSV output (default: alerts.csv)
+Exit codes: `0` ok, `2` nothing found / nothing checked, `130` interrupted
+(Ctrl+C), `1` fatal error.
 
-* --vt-config VirusTotal config (default: vt_config.json)
+## VirusTotal Configuration
 
-* --vt-check enable VirusTotal checks
+`src/vt_config.json` — full schema:
 
-* --vt-only run VirusTotal only
-
-# VirusTotal Configuration
-
-* Edit vt_config.json
-```
+```json
 {
   "api_key": "YOUR_VIRUSTOTAL_API_KEY_HERE",
   "rate_limit_delay": 1,
@@ -126,57 +143,72 @@ python analyzer.py --ioc ioc_list.json --vt-config vt_config.json --vt-only
   "check_domains": true,
   "check_urls": true,
   "save_vt_results": true,
-  "vt_results_file": "virustotal_results.json"
+  "vt_results_file": "virustotal_results.json",
+
+  "cache_enabled": true,
+  "cache_path": ".vt_cache.json",
+  "cache_ttl_hours": 24,
+  "negative_cache_ttl_hours": 4,
+
+  "max_retries": 4,
+  "request_timeout": 30
 }
 ```
 
-### Example Output
+The cache + retry fields are **optional** — defaults are sensible if you omit
+them.
+
+## Output Files
+
+- `alerts.csv` — IOC matches in logs (columns: `file, ioc_type, pattern, line`).
+- `alerts_combined.csv` — log + VirusTotal results unified.
+- `alerts_virustotal.csv` — VirusTotal results only.
+- `virustotal_results.json` — raw VirusTotal results dict.
+- `.vt_cache.json` — persistent cache (gitignored).
+
+## Sample Output
+
 ```
-Log Analysis
-=== IOC Log Analyzer with VirusTotal Integration ===
-IOC file: ioc_list.json
-Log file: apache.log
+==================================================
+  IOC Log Analyzer with VirusTotal Integration
+==================================================
+[INFO] IOC file:    ioc_list.json
+[INFO] Log file:    apache.log
+[INFO] Output file: alerts.csv
+[INFO] Loaded IOCs: 5 items
 
-Found 5 alerts
-Alerts saved to alerts.csv
-```
-```
-VirusTotal Integration
-Checking hash: fb25dd6d01b1fd4f826521377737a37e
-[WARNING] DETECTED: 34/75 engines consider it malicious
-Results Summary
-Total checked: 2
-Malicious: 2
-Suspicious: 0
-
-Output Files
+==================================================
+  Log file analysis: apache.log
+==================================================
+ALERT! ip 8.8.8.8  8.8.8.8 - - [22/Jun/2025:14:15:25 +0000] "GET /about.html ..."
+[OK] Found 5 alerts
+[OK] Alerts saved to alerts.csv
 ```
 
-### Combined Analysis
+## Adding Your Own IOCs
 
-* results_combined.csv - log + VirusTotal results
+Edit `src/ioc_list.json`:
 
-* results_virustotal.csv - VirusTotal only
+```json
+{
+  "ips":         ["1.2.3.4", "192.0.2.10"],
+  "domains":     ["evil.example", "bad-site.org"],
+  "file_hashes": ["44d88612fea8a8f36de82e1278abb02f"],
+  "urls":        ["http://evil.example/payload"]
+}
+```
 
-### Log Only
+## Run the tests
 
-* alerts.csv - log analysis results
+```bash
+python -m unittest discover -s tests -v
+```
 
-# Requirements
+## Notes
 
-* Python 3
-
-* requests (install with pip install -r requirements.txt)
-
-# Notes
-
-* Scans all IOC types in one run
-
-* IPs are matched exactly, others case-insensitive
-
-* Free VirusTotal tier allows 4 requests per minute
-
-* VirusTotal results are saved in JSON
-
-* If files are missing, the script shows an error
-
+- IPs are matched as exact substrings; domains use word-boundary matching;
+  hashes and URLs are matched case-insensitively.
+- VirusTotal free tier is 4 requests/minute — the persistent cache means
+  repeat runs only re-query IOCs that have expired or were missing.
+- Sensitive files (`vt_config.json`, `virustotal_results.json`,
+  `.vt_cache.json`) are gitignored by default.
