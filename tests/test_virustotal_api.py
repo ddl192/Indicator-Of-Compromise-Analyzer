@@ -2,7 +2,7 @@
 Tests for `virustotal_api.VirusTotalAPI`.
 
 We mock `requests.Session.get` / `.post` so no real network calls happen.
-We also patch `time.sleep` so the retry/poll logic doesn't actually wait —
+We also patch `time.sleep` so the retry/poll logic doesn't actually wait -
 tests run in milliseconds.
 """
 
