@@ -41,11 +41,13 @@ jobs:
 
       - name: Smoke-test CLI (log analysis only — no network)
         shell: bash
+        env:
+          TMP_OUT: ${{ runner.temp }}/alerts.csv
         run: |
           cd src
           cp ../tests/apache.log .
           cp ../tests/ioc_list.json ./ioc_list.json
-          python analyzer.py --log apache.log --ioc ioc_list.json --output /tmp/alerts.csv -q
-          test -f /tmp/alerts.csv
+          python analyzer.py --log apache.log --ioc ioc_list.json --output "$TMP_OUT" -q
+          test -f "$TMP_OUT"
           # The first line must be the original CSV header (compat check).
-          head -n1 /tmp/alerts.csv | grep -q '^file,ioc_type,pattern,line'
+          head -n1 "$TMP_OUT" | grep -q '^file,ioc_type,pattern,line'
