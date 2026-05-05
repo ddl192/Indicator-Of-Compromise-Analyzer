@@ -3,16 +3,17 @@ src/__pycache__/
 *.pyc
 *.pyo
 *.pyd
-src/*.pyc
-src/*.pyo
-src/*.pyd
 
+# Virtual envs
 venv/
 .env/
 
+# Logs (allow the bundled sample one)
 *.log
 !src/apache.log
+!tests/apache.log
 
+# CSV outputs (allow the bundled sample one)
 *.csv
 !src/alerts.csv
 
@@ -20,4 +21,14 @@ venv/
 src/vt_config.json
 src/virustotal_results.json
 *.key
-*.secret 
+*.secret
+
+# Persistent VT cache
+.vt_cache.json
+src/.vt_cache.json
+**/.vt_cache.json.tmp
+
+# IDEs
+.idea/
+.vscode/
+.DS_Store
